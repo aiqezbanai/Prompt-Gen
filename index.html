@@ -3,338 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI QEZ PROMPT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Aria Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-        .prompt-card {
-            min-height: 150px;
-        }
-        .copy-svg {
-            width: 1rem;
-            height: 1rem;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        select, input, button { margin: 10px; padding: 10px; font-size: 16px; }
+        #info { margin: 20px; font-size: 18px; }
+        footer { margin-top: 50px; font-size: 14px; }
+        @media (max-width: 600px) { .container { padding: 10px; } }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col items-center justify-center">
-
-    <div class="max-w-4xl w-full bg-white p-6 rounded-3xl shadow-2xl">
-        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">AI QEZ PROMPT</h1>
-        <p class="text-center text-gray-600 mb-8">Ընտրեք համապատասխան դաշտերը հերթականությամբ՝ Prompt-ները տեսնելու համար։</p>
-
-        <!-- Selectors -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <!-- AI Agent Selector -->
-            <div>
-                <label for="ai-agent" class="block text-sm font-medium text-gray-700 mb-2">AI Գործակալ</label>
-                <select id="ai-agent" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
-                    <option value="" selected disabled>Ընտրել AI...</option>
-                    <option value="ChatGPT">ChatGPT</option>
-                    <option value="Gemini">Gemini</option>
-                    <option value="Claude">Claude</option>
-                    <option value="Grok">Grok</option>
-                    <option value="DeepSeek">DeepSeek</option>
-                    <option value="Copilot">Copilot</option>
-                    <option value="v0.dev">v0.dev</option>
-                    <option value="Lovable">Lovable</option>
-                    <option value="Bolt.new">Bolt.new</option>
-                    <option value="Cursor">Cursor</option>
-                </select>
-            </div>
-
-            <!-- Category Selector -->
-            <div>
-                <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Կատեգորիա</label>
-                <select id="category" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
-                    <option value="" selected disabled>Ընտրել կատեգորիա...</option>
-                    <option value="Web App">Web App</option>
-                    <option value="Website">Website</option>
-                    <option value="Chrome Plugin">Chrome Plugin</option>
-                    <option value="Figma Plugin">Figma Plugin</option>
-                    <option value="Mobile App">Mobile App</option>
-                    <option value="TG Bot">TG Bot</option>
-                    <option value="Desktop Software">Desktop Software</option>
-                </select>
-            </div>
-
-            <!-- Field Selector -->
-            <div>
-                <label for="field" class="block text-sm font-medium text-gray-700 mb-2">Ոլորտ</label>
-                <select id="field" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
-                    <option value="" selected disabled>Ընտրել ոլորտ...</option>
-                    <option value="Ծրագրավորում">Ծրագրավորում</option>
-                    <option value="Դիզայն">Դիզայն</option>
-                    <option value="Ավտոմատացում">Ավտոմատացում</option>
-                    <option value="Ֆինանս">Ֆինանս</option>
-                    <option value="Առողջապահություն">Առողջապահություն</option>
-                    <option value="Տրանսպորտ">Տրանսպորտ</option>
-                    <option value="Կոմունիկացիա">Կոմունիկացիա</option>
-                    <option value="Սնունդ">Սնունդ</option>
-                    <option value="Մեդիա">Մեդիա</option>
-                    <option value="Ինտերնետ">Ինտերնետ</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Prompts Container -->
-        <div id="prompts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display:none;">
-            <!-- Prompt cards or Generate button will be inserted here by JavaScript -->
-        </div>
-
+<body>
+    <div class="container">
+        <h1>Aria Converter</h1>
+        <input type="file" id="fileInput" accept=".pdf"/>
+        <select id="format">
+            <option value="png">PDF → PNG</option>
+            <option value="jpg">PDF → JPG</option>
+            <option value="ocr">OCR PDF (Տեքստի ճանաչում)</option>
+        </select>
+        <button onclick="convert()">Փոխակերպել և ներբեռնել ZIP</button>
+        <div id="info"></div>
     </div>
+    <footer>
+        Copyright © | <a href="https://github.com/ariadevelopmentgroup/AriaConverter" target="_blank">Aria Development Group</a> | Հեղինակային բոլոր իրավունքները պաշտպանված են:
+    </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const aiAgentSelect = document.getElementById('ai-agent');
-            const categorySelect = document.getElementById('category');
-            const fieldSelect = document.getElementById('field');
-            const promptsContainer = document.getElementById('prompts-container');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
 
-            const prompts = {
-                "ChatGPT": {
-                    "Web App": {
-                        "Ծրագրավորում": [
-                            "Act as a senior software developer. Create a single-file HTML, CSS, and JavaScript web application for a real-time multiplayer chess game. Include all game logic and a clean, responsive UI.",
-                            "Develop a web application that takes a GitHub repository URL and analyzes its code quality, providing a detailed report.",
-                            "Design and implement a single-page web app for a recipe book. The app should allow users to add, edit, and search for recipes with images and ingredients lists."
-                        ],
-                        "Դիզայն": [
-                            "Act as a UX designer. Create a user flow for a new e-commerce web app, focusing on the checkout process. Provide wireframes for the key screens.",
-                            "Generate 5 different minimalist color palettes for a financial web application's dashboard. Include hex codes and a brief explanation of each palette's mood.",
-                            "Develop a comprehensive style guide for a music streaming web app, including typography, button styles, and iconography."
-                        ],
-                        "Ֆինանս": [
-                            "Create a Python script that uses financial APIs to fetch real-time stock data and generate a performance chart for a specific portfolio.",
-                            "Act as a financial analyst. Write a comprehensive report on the quarterly earnings of a major tech company, analyzing key metrics like revenue, profit margin, and future outlook.",
-                            "Develop a web application that helps users track their monthly expenses and visualize their spending habits through charts and graphs."
-                        ],
-                        "Ավտոմատացում": [
-                            "Act as a data engineer. Generate a Python script to automate the collection, cleaning, and storage of data from multiple online sources into a single database.",
-                            "Write a prompt to create an automated workflow in Zapier that sends an email notification every time a new document is added to a specific Google Drive folder."
-                        ]
-                    },
-                    "Website": {
-                        "Ծրագրավորում": [
-                            "Write a full-stack JavaScript prompt for a personal portfolio website, including a backend to handle form submissions and a responsive frontend.",
-                            "Develop a prompt for a serverless function that powers a contact form on a static website.",
-                            "Create a prompt for a script that automatically generates a sitemap for a website based on its internal links."
-                        ],
-                        "Դիզայն": [
-                            "Design a single-page website for a non-profit organization. The design should be inviting and encourage donations. Use a modern, accessible color scheme.",
-                            "Create a prompt to design a website for a luxury car dealership, focusing on high-quality visuals and a sophisticated user interface.",
-                            "Generate a prompt to design a blog website with a clean, readable layout and a dark mode option."
-                        ]
-                    },
-                    "Mobile App": {
-                         "Ծրագրավորում": [
-                            "Act as a React Native developer. Create a single-file component for a mobile app that displays weather information for the user's current location.",
-                            "Write a prompt for an Android app that uses the camera to scan QR codes and display the decoded information.",
-                            "Develop a prompt for a mobile app that helps users find and reserve parking spots in real-time."
-                        ],
-                        "Առողջապահություն": [
-                            "Design and develop a mobile app that helps users track their daily water intake and sends them hydration reminders.",
-                            "Create a prompt for a mobile app that allows patients to securely access their medical records and communicate with their doctors.",
-                            "Generate a prompt for a mobile app that provides guided meditation sessions and stress relief exercises."
-                        ]
-                    }
-                },
-                "Gemini": {
-                    "Web App": {
-                        "Ծրագրավորում": [
-                            "Act as an Angular developer. Create a single-file Angular component for a simple currency converter web app that fetches real-time exchange rates from a public API.",
-                            "Develop a web application using vanilla JavaScript that helps users learn a new language through flashcards. Include a user progress tracking system.",
-                            "Write a prompt to build a real-time collaborative code editor in a single HTML file using WebSockets."
-                        ],
-                        "Դիզայն": [
-                            "Design the UI/UX for a project management web app. Focus on creating a clean, intuitive dashboard with clear visual hierarchies.",
-                            "Generate 3 different design concepts for a social media web app. Describe the target audience for each concept and the key design elements.",
-                            "Create a prompt for an immersive 3D portfolio website using Three.js and modern WebGL techniques."
-                        ]
-                    },
-                    "Website": {
-                        "Ծրագրավորում": [
-                            "Act as a full-stack developer. Create a responsive portfolio website that can be hosted on a single file, featuring projects, a contact form, and a 'dark mode' toggle button.",
-                            "Develop a prompt for a personal blog website with pagination, tags, and a search function.",
-                            "Write a script that creates a dynamic 'coming soon' page with a countdown timer and a subscription form."
-                        ],
-                        "Սնունդ": [
-                            "Design a beautiful and user-friendly website for a fictional restaurant. The site should feature a menu, location details, and an online reservation form.",
-                            "Create a prompt for a website dedicated to healthy eating. The site should include recipes, nutritional information, and a blog.",
-                            "Generate a prompt for a website for a food delivery service, focusing on the user experience from browsing to ordering."
-                        ]
-                    }
-                },
-                "Copilot": {
-                    "Chrome Plugin": {
-                        "Ծրագրավորում": [
-                            "Develop a Chrome extension that automatically highlights and summarizes the key points of any article on a webpage.",
-                            "Write a prompt to create a Chrome extension that saves and organizes your favorite tweets into a personal collection.",
-                            "Create a prompt for a plugin that helps developers by injecting a custom CSS theme into any website."
-                        ]
-                    }
-                },
-                "v0.dev": {
-                    "Web App": {
-                        "Դիզայն": [
-                            "Design a component for a minimalist weather web app that shows the current temperature, a weather icon, and a short forecast for the next 24 hours.",
-                            "Create a prompt for a dashboard component with a line chart showing sales data for the last quarter.",
-                            "Generate a user interface for a task management app, with a list of tasks, a progress bar, and a button to add new tasks."
-                        ],
-                        "Առողջապահություն": [
-                            "Design a user interface for a fitness tracker web app, including a dashboard with daily activity goals and a progress chart.",
-                            "Create a prompt for a UI component that helps users schedule doctor's appointments.",
-                            "Generate a prompt for a simple UI for a calorie tracker app, allowing users to log their food intake and see a summary."
-                        ]
-                    }
-                },
-                "Figma Plugin": {
-                    "Figma Plugin": {
-                        "Դիզայն": [
-                            "Develop a Figma plugin that automatically generates a color palette from any selected image on the canvas.",
-                            "Write a prompt to create a Figma plugin that renames all layers in a frame based on a custom naming convention.",
-                            "Create a prompt for a Figma plugin that helps designers check for accessibility issues in their designs, such as color contrast and font size."
-                        ]
-                    }
-                },
-                "Bolt.new": {
-                    "TG Bot": {
-                         "Կոմունիկացիա": [
-                            "Write a prompt to develop a Telegram bot that can translate messages from one language to another in real-time.",
-                            "Create a prompt for a Telegram bot that helps users manage their to-do lists and sends them daily reminders.",
-                            "Generate a prompt for a Telegram bot that provides a daily summary of news from various sources."
-                        ]
-                    }
+        async function convert() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file || file.type !== 'application/pdf') {
+                alert('Ընտրեք PDF ֆայլ');
+                return;
+            }
+
+            const info = document.getElementById('info');
+            info.innerHTML = `Անուն: ${file.name}<br>Չափս: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            info.innerHTML += `<br>Էջերի քանակ: ${pdf.numPages}`;
+
+            const zip = new JSZip();
+            const format = document.getElementById('format').value;
+
+            if (format === 'ocr') {
+                info.innerHTML += '<br>OCR գործընթաց (դանդաղ է)...';
+                let text = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({scale: 2});
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const {data: {text: pageText}} = await Tesseract.recognize(dataUrl, 'eng+rus+hy');
+                    text += `Էջ ${i}:\n${pageText}\n\n`;
                 }
-            };
-
-            const selectors = [aiAgentSelect, categorySelect, fieldSelect];
-
-            selectors.forEach(selector => {
-                selector.addEventListener('change', updatePrompts);
-            });
-
-            function updatePrompts() {
-                const aiAgent = aiAgentSelect.value;
-                const category = categorySelect.value;
-                const field = fieldSelect.value;
-
-                promptsContainer.style.display = 'none';
-                promptsContainer.innerHTML = '';
-
-                if (aiAgent && category && field) {
-                    const selectedPrompts = (prompts[aiAgent] && prompts[aiAgent][category] && prompts[aiAgent][category][field]) ? prompts[aiAgent][category][field] : [];
-                    promptsContainer.style.display = 'grid';
-
-                    if (selectedPrompts.length > 0) {
-                        renderPrompts(selectedPrompts);
-                    } else {
-                        showGenerateButton(aiAgent, category, field);
-                    }
+                zip.file('ocr_text.txt', text);
+            } else {
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({scale: 2});
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, format === 'png' ? 'image/png' : 'image/jpeg', 0.95));
+                    zip.file(`page_${i}.${format}`, blob);
                 }
             }
 
-            function showGenerateButton(aiAgent, category, field) {
-                const generateButtonHTML = `
-                    <div class="col-span-full flex flex-col items-center p-8 text-center text-gray-500">
-                        <p class="mb-4">Ներողություն, այս կատեգորիայի համար Prompt-ներ չեն հայտնաբերվել</p>
-                        <button id="generate-button" class="px-6 py-3 bg-indigo-500 text-white font-bold rounded-xl hover:bg-indigo-600 transition duration-300 shadow-md">
-                            Գեներացնել Prompt
-                        </button>
-                    </div>
-                `;
-                promptsContainer.innerHTML = generateButtonHTML;
-                document.getElementById('generate-button').addEventListener('click', () => handleGenerateClick(aiAgent, category, field));
-            }
-
-            function handleGenerateClick(aiAgent, category, field) {
-                promptsContainer.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center p-8 text-gray-600">
-                        <div class="loader mb-4"></div>
-                        <p class="text-center">Գեներացվում է...
-                        (Խնդրում ենք սպասել 10 վայրկյան)</p>
-                    </div>
-                `;
-
-                setTimeout(() => {
-                    const generatedPromptText = `Generate a prompt for a ${aiAgent} AI agent to develop a ${category} in the ${field} industry. The prompt should be clear, detailed, and aimed at a developer or designer.`;
-                    renderPrompts([generatedPromptText]);
-                }, 10000); // 10 seconds
-            }
-
-            function renderPrompts(promptList) {
-                promptsContainer.innerHTML = ''; // Clear previous content
-
-                if (promptList.length === 0) {
-                    promptsContainer.innerHTML = '<p class="col-span-full text-center text-gray-500 p-8">Ներողություն, այս կատեգորիայի համար Prompt-ներ չենք գտել։</p>';
-                    return;
-                }
-
-                promptList.forEach(promptText => {
-                    const card = document.createElement('div');
-                    card.className = 'prompt-card relative bg-white border border-gray-200 rounded-2xl shadow-md p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300';
-                    
-                    const promptParagraph = document.createElement('p');
-                    promptParagraph.textContent = promptText;
-                    promptParagraph.className = 'text-gray-700 mb-4 flex-grow';
-
-                    const copyButton = document.createElement('button');
-                    copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="copy-svg inline-block mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                            </svg>
-                                            <span class="text-sm">Պատճենել</span>`;
-                    copyButton.className = 'w-full mt-4 flex items-center justify-center py-2 px-4 bg-gray-100 text-gray-800 rounded-xl hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300';
-                    copyButton.onclick = () => copyPrompt(promptText, copyButton);
-                    
-                    card.appendChild(promptParagraph);
-                    card.appendChild(copyButton);
-                    promptsContainer.appendChild(card);
-                });
-            }
-
-            function copyPrompt(text, button) {
-                navigator.clipboard.writeText(text).then(() => {
-                    const originalHTML = button.innerHTML;
-                    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="copy-svg inline-block mr-2 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        <span class="text-sm text-green-500">Պատճենված է!</span>`;
-                    setTimeout(() => {
-                        button.innerHTML = originalHTML;
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy text:', err);
-                    alert('Պատճենումը ձախողվեց։ Խնդրում ենք փորձել կրկին։');
-                });
-            }
-        });
+            const date = new Date();
+            const fileName = `ARIA-CONVERTER__${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}.zip`;
+            const content = await zip.generateAsync({type: 'blob'});
+            saveAs(content, fileName);
+            info.innerHTML += '<br>Պատրաստ է!';
+        }
     </script>
-  
-    <br>
-        <br>
-    <!-- Ֆութերի տեքստը -->
-    <p class="text-sm">
-      Copyright 2025 | Powered by՝ <a href="https://github.com/aiqezbanai" target="_blank" class="text-blue-400 hover:underline">Ai Qez Ban</a>
-    </p>
-  </div>
-</footer>
-    </br>
-    </br>
 </body>
 </html>
